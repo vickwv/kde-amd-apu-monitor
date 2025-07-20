@@ -191,6 +191,9 @@ PlasmoidItem {
     property real uploadSpeed: 0.0
     property string downloadText: "↓ 0 B/s"
     property string uploadText: "↑ 0 B/s"
+    property int networkStaleCounter: 0
+    property real lastDownloadSpeed: 0.0
+    property real lastUploadSpeed: 0.0
     property string topCpuProcess: ""
     property real topCpuUsage: 0.0
     property string topMemProcess: ""
@@ -414,6 +417,10 @@ PlasmoidItem {
         onValueChanged: {
             downloadSpeed = value || 0;
             downloadText = "↓ " + formatNetworkSpeed(downloadSpeed);
+            // Reset stale counter when we get valid data
+            if (value > 0) {
+                networkStaleCounter = 0;
+            }
         }
     }
     
@@ -427,6 +434,46 @@ PlasmoidItem {
         onValueChanged: {
             uploadSpeed = value || 0;
             uploadText = "↑ " + formatNetworkSpeed(uploadSpeed);
+            // Reset stale counter when we get valid data
+            if (value > 0) {
+                networkStaleCounter = 0;
+            }
+        }
+    }
+    
+    // Network sensor health monitoring and recovery
+    Timer {
+        id: networkHealthTimer
+        interval: 5000 // Check every 5 seconds
+        running: true
+        repeat: true
+        
+        onTriggered: {
+            // Check if sensors are stale (no changes for multiple intervals)
+            var isStale = false;
+            
+            // Consider it stale if:
+            // 1. Both speeds are exactly 0
+            // 2. Both speeds haven't changed at all (could be stuck)
+            if ((downloadSpeed === 0 && uploadSpeed === 0) || 
+                (downloadSpeed === lastDownloadSpeed && uploadSpeed === lastUploadSpeed)) {
+                networkStaleCounter++;
+                isStale = true;
+            } else {
+                networkStaleCounter = 0;
+            }
+            
+            // If stale for more than 6 intervals (30 seconds), try to recover
+            if (networkStaleCounter > 6) {
+                console.log("Network sensors appear stale, attempting recovery...");
+                networkFallbackTimer.forceReconnect = true;
+                networkFallbackTimer.running = true;
+                networkFallbackTimer.attemptIndex = 0;
+                networkStaleCounter = 0;
+            }
+            
+            lastDownloadSpeed = downloadSpeed;
+            lastUploadSpeed = uploadSpeed;
         }
     }
     
@@ -437,6 +484,7 @@ PlasmoidItem {
         running: downloadSpeed === 0 && uploadSpeed === 0
         repeat: true
         property int attemptIndex: 0
+        property bool forceReconnect: false
         
         // Common network interface names
         property var commonInterfaces: ["wlo1", "wlan0", "wlp3s0", "wlp2s0", "enp2s0", "enp3s0", "eth0", "eno1"]
@@ -455,7 +503,6 @@ PlasmoidItem {
                 ids.push("network/" + iface + "/download");
                 ids.push("network/" + iface + "/downloadBits");
                 ids.push("network/interfaces/" + iface + "/receiver/data");
-                ids.push("network/interfaces/" + iface + "/receiver/dataTotal");
             }
             
             return ids;
@@ -474,7 +521,6 @@ PlasmoidItem {
                 ids.push("network/" + iface + "/upload");
                 ids.push("network/" + iface + "/uploadBits");
                 ids.push("network/interfaces/" + iface + "/transmitter/data");
-                ids.push("network/interfaces/" + iface + "/transmitter/dataTotal");
             }
             
             return ids;
@@ -482,19 +528,26 @@ PlasmoidItem {
         
         onTriggered: {
             if (attemptIndex < fallbackDownloadIds.length) {
-                if (downloadSpeed === 0) {
-                    downloadSensor.sensorId = fallbackDownloadIds[attemptIndex]
+                if (downloadSpeed === 0 || forceReconnect) {
+                    // Force sensor reconnection by disabling and re-enabling
+                    downloadSensor.enabled = false;
+                    downloadSensor.sensorId = fallbackDownloadIds[attemptIndex];
+                    downloadSensor.enabled = true;
                 }
-                if (uploadSpeed === 0 && attemptIndex < fallbackUploadIds.length) {
-                    uploadSensor.sensorId = fallbackUploadIds[attemptIndex]
+                if ((uploadSpeed === 0 || forceReconnect) && attemptIndex < fallbackUploadIds.length) {
+                    // Force sensor reconnection by disabling and re-enabling
+                    uploadSensor.enabled = false;
+                    uploadSensor.sensorId = fallbackUploadIds[attemptIndex];
+                    uploadSensor.enabled = true;
                 }
             }
             
             attemptIndex++
             
             // Stop after trying all sensors or if we found working ones
-            if (attemptIndex >= fallbackDownloadIds.length || (downloadSpeed > 0 && uploadSpeed > 0)) {
-                running = false
+            if (attemptIndex >= fallbackDownloadIds.length || (downloadSpeed > 0 && uploadSpeed > 0 && !forceReconnect)) {
+                running = false;
+                forceReconnect = false;
             }
         }
     }
