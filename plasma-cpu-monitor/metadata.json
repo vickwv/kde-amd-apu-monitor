@@ -1,0 +1,30 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "user@example.com",
+                "Name": "CPU Monitor Widget Author"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Real-time system resource monitor for AMD APUs with power monitoring support",
+        "Description[zh_CN]": "支持功耗监控的AMD APU实时系统资源监控器",
+        "Description[zh_TW]": "支援功耗監控的AMD APU即時系統資源監控器",
+        "Description[ja]": "電力監視機能を備えたAMD APU用リアルタイムシステムリソースモニター",
+        "Description[ko]": "전력 모니터링을 지원하는 AMD APU용 실시간 시스템 리소스 모니터",
+        "EnabledByDefault": true,
+        "Icon": "utilities-system-monitor",
+        "Id": "org.kde.plasma.cpumonitor",
+        "License": "GPL-2.0+",
+        "Name": "AMD APU Monitor",
+        "Name[zh_CN]": "AMD APU监控器",
+        "Name[zh_TW]": "AMD APU監控器",
+        "Name[ja]": "AMD APUモニター",
+        "Name[ko]": "AMD APU 모니터",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-ConfigPlugins": ["kcm_systemmonitor"]
+}

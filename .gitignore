@@ -1,0 +1,27 @@
+# Claude AI files
+.claude/
+
+# KDE cache files
+*.qmlc
+*.jsc
+.qmake.stash
+
+# Build directories
+build/
+build-*/
+
+# Backup files
+*~
+*.bak
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.kdev4
+.kdev4/

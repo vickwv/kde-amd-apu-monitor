@@ -1,0 +1,104 @@
+# CPU Monitor Widget.
+# Copyright (C) YEAR THE plasma-cpumonitor'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the plasma-cpumonitor package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-20 10:52+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:214
+msgid "MEM:"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:528
+#: plasma-cpu-monitor/contents/ui/main.qml:685
+msgid "CPU"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:585
+msgid "Unknown"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:585
+msgid "Power: %1"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:586
+msgid "Temp: %1"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:608
+msgid "M"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:733
+msgid "PWR"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:774
+msgid "MEM"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:853
+#: plasma-cpu-monitor/contents/ui/main.qml:1297
+msgid "System Resource Monitor"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:864
+msgid "CPU Status"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:915
+msgid "CPU Power"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:966
+msgid "Memory Usage"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1017
+msgid "Network Speed"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1074
+msgid "Process Information"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1095
+msgid "Top CPU:"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1121
+msgid "Top Memory:"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1155
+msgid "System Load"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1163
+msgid "(%1 core CPU, recommended load < %2)"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1263
+msgid "1 min"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1272
+msgid "5 min"
+msgstr ""
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1281
+msgid "15 min"
+msgstr ""

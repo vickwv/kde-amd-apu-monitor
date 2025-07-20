@@ -1,0 +1,102 @@
+# Korean translation for CPU Monitor Widget
+# Copyright (C) 2025
+# This file is distributed under the same license as the plasma-cpumonitor package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-20 10:52+0800\n"
+"PO-Revision-Date: 2025-07-20 11:30+0800\n"
+"Last-Translator: \n"
+"Language-Team: Korean\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:214
+msgid "MEM:"
+msgstr "메모리:"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:528
+#: plasma-cpu-monitor/contents/ui/main.qml:685
+msgid "CPU"
+msgstr "CPU"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:585
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:585
+msgid "Power: %1"
+msgstr "전력: %1"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:586
+msgid "Temp: %1"
+msgstr "온도: %1"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:608
+msgid "M"
+msgstr "M"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:733
+msgid "PWR"
+msgstr "전력"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:774
+msgid "MEM"
+msgstr "메모리"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:853
+#: plasma-cpu-monitor/contents/ui/main.qml:1297
+msgid "System Resource Monitor"
+msgstr "시스템 리소스 모니터"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:864
+msgid "CPU Status"
+msgstr "CPU 상태"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:915
+msgid "CPU Power"
+msgstr "CPU 전력"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:966
+msgid "Memory Usage"
+msgstr "메모리 사용률"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1017
+msgid "Network Speed"
+msgstr "네트워크 속도"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1074
+msgid "Process Information"
+msgstr "프로세스 정보"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1095
+msgid "Top CPU:"
+msgstr "최고 CPU:"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1121
+msgid "Top Memory:"
+msgstr "최고 메모리:"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1155
+msgid "System Load"
+msgstr "시스템 부하"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1163
+msgid "(%1 core CPU, recommended load < %2)"
+msgstr "(%1코어 CPU, 권장 부하<%2)"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1263
+msgid "1 min"
+msgstr "1분"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1272
+msgid "5 min"
+msgstr "5분"
+
+#: plasma-cpu-monitor/contents/ui/main.qml:1281
+msgid "15 min"
+msgstr "15분"
