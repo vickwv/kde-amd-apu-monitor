@@ -68,7 +68,9 @@ PlasmoidItem {
                 "(%1 core CPU, recommended load < %2)": "（%1核CPU，建议负载<%2）",
                 "1 min": "1分钟",
                 "5 min": "5分钟",
-                "15 min": "15分钟"
+                "15 min": "15分钟",
+                "GPU": "显卡",
+                "GPU Status": "显卡状态"
             },
             "zh_TW": {
                 "CPU": "CPU",
@@ -91,7 +93,9 @@ PlasmoidItem {
                 "(%1 core CPU, recommended load < %2)": "（%1核CPU，建議負載<%2）",
                 "1 min": "1分鐘",
                 "5 min": "5分鐘",
-                "15 min": "15分鐘"
+                "15 min": "15分鐘",
+                "GPU": "顯卡",
+                "GPU Status": "顯卡狀態"
             },
             "ja": {
                 "CPU": "CPU",
@@ -114,7 +118,9 @@ PlasmoidItem {
                 "(%1 core CPU, recommended load < %2)": "（%1コアCPU、推奨負荷<%2）",
                 "1 min": "1分",
                 "5 min": "5分",
-                "15 min": "15分"
+                "15 min": "15分",
+                "GPU": "GPU",
+                "GPU Status": "GPU状態"
             },
             "ko": {
                 "CPU": "CPU",
@@ -137,7 +143,9 @@ PlasmoidItem {
                 "(%1 core CPU, recommended load < %2)": "(%1코어 CPU, 권장 부하<%2)",
                 "1 min": "1분",
                 "5 min": "5분",
-                "15 min": "15분"
+                "15 min": "15분",
+                "GPU": "GPU",
+                "GPU Status": "GPU 상태"
             },
             "en": {
                 "CPU": "CPU",
@@ -160,7 +168,9 @@ PlasmoidItem {
                 "(%1 core CPU, recommended load < %2)": "(%1 core CPU, recommended load < %2)",
                 "1 min": "1 min",
                 "5 min": "5 min",
-                "15 min": "15 min"
+                "15 min": "15 min",
+                "GPU": "GPU",
+                "GPU Status": "GPU Status"
             }
         };
     }
@@ -203,6 +213,12 @@ PlasmoidItem {
     property real systemLoad15: 0.0
     property string systemLoadText: "0.00 0.00 0.00"
     property int cpuCoreCount: 4 // Default 4 cores, will be dynamically fetched
+    property real gpuUsage: 0.0
+    property real gpuFrequency: 0.0
+    property string gpuUsageText: "GPU: 0%"
+    property string gpuFreqText: "0 MHz"
+    property real gpuTemp: 0.0
+    property string gpuTempText: "0°C"
     
     // Use KSysGuard Sensors to read CPU usage
     Sensors.Sensor {
@@ -357,6 +373,172 @@ PlasmoidItem {
                 // Estimation formula: base power + (usage * (max power - base power) * frequency factor)
                 cpuPower = basePower + (cpuUsage / 100) * (maxPower - basePower) * freqFactor;
                 cpuPowerText = cpuPower.toFixed(1) + " W*";
+            }
+        }
+    }
+    
+    // Read GPU usage
+    Sensors.Sensor {
+        id: gpuUsageSensor
+        sensorId: "lmsensors/amdgpu-pci-6500/gpu_busy_percent"
+        updateRateLimit: 1000
+        enabled: true
+        
+        onValueChanged: {
+            gpuUsage = value || 0;
+            gpuUsageText = "GPU: " + Math.round(gpuUsage) + "%";
+        }
+    }
+    
+    // GPU usage fallback sensors
+    Timer {
+        id: gpuUsageFallbackTimer
+        interval: 3000
+        running: gpuUsage === 0
+        repeat: true
+        property int attemptIndex: 0
+        property var fallbackIds: [
+            "lmsensors/amdgpu-pci-6500/gpu_busy_percent",
+            "lmsensors/amdgpu-pci-c500/gpu_busy_percent",
+            "lmsensors/amdgpu-pci-*/gpu_busy_percent",
+            "gpu/gpu1/usage",
+            "gpu/gpu0/usage",
+            "gpu/gpu1/coreLoad",
+            "gpu/gpu0/coreLoad",
+            "gpu/gpu0/memoryLoad",
+            "gpu/amdgpu/gpu0/usage"
+        ]
+        
+        onTriggered: {
+            if (attemptIndex < fallbackIds.length && gpuUsage === 0) {
+                gpuUsageSensor.sensorId = fallbackIds[attemptIndex]
+                attemptIndex++
+            } else {
+                running = false
+                // If no sensor found, try reading from command line
+                if (gpuUsage === 0) {
+                    gpuReadTimer.running = true;
+                }
+            }
+        }
+    }
+    
+    // Read GPU frequency
+    Sensors.Sensor {
+        id: gpuFreqSensor
+        sensorId: "lmsensors/amdgpu-pci-6500/freq1_input"
+        updateRateLimit: 1000
+        enabled: true
+        
+        onValueChanged: {
+            gpuFrequency = value || 0;
+            // Convert MHz to GHz
+            gpuFreqText = (gpuFrequency / 1000).toFixed(2) + " GHz";
+        }
+    }
+    
+    // GPU frequency fallback sensors
+    Timer {
+        id: gpuFreqFallbackTimer
+        interval: 3000
+        running: gpuFrequency === 0
+        repeat: true
+        property int attemptIndex: 0
+        property var fallbackIds: [
+            "lmsensors/amdgpu-pci-6500/sclk",
+            "lmsensors/amdgpu-pci-c500/freq1_input",
+            "lmsensors/amdgpu-pci-*/freq1_input",
+            "lmsensors/amdgpu-pci-6500/freq1_input",
+            "gpu/gpu1/frequency",
+            "gpu/gpu0/frequency",
+            "gpu/gpu1/coreFrequency",
+            "gpu/gpu0/coreFrequency",
+            "gpu/amdgpu/gpu0/coreFrequency"
+        ]
+        
+        onTriggered: {
+            if (attemptIndex < fallbackIds.length && gpuFrequency === 0) {
+                gpuFreqSensor.sensorId = fallbackIds[attemptIndex]
+                attemptIndex++
+            } else {
+                running = false
+                // If no sensor found, try reading from command line
+                if (gpuFrequency === 0) {
+                    gpuReadTimer.running = true;
+                }
+            }
+        }
+    }
+    
+    // Read GPU temperature
+    Sensors.Sensor {
+        id: gpuTempSensor
+        sensorId: "lmsensors/amdgpu-pci-6500/edge"
+        updateRateLimit: 2000
+        enabled: true
+        
+        onValueChanged: {
+            gpuTemp = value || 0;
+            gpuTempText = Math.round(gpuTemp) + "°C";
+        }
+    }
+    
+    // GPU temperature fallback sensors
+    Timer {
+        id: gpuTempFallbackTimer
+        interval: 3000
+        running: gpuTemp === 0
+        repeat: true
+        property int attemptIndex: 0
+        property var fallbackIds: [
+            "lmsensors/amdgpu-pci-6500/edge",
+            "lmsensors/amdgpu-pci-c500/edge",
+            "lmsensors/amdgpu-pci-*/edge",
+            "lmsensors/amdgpu-pci-6500/temp1_input",
+            "lmsensors/amdgpu-pci-c500/temp1_input",
+            "lmsensors/amdgpu-pci-*/temp1_input",
+            "gpu/gpu1/temperature",
+            "gpu/gpu0/temperature",
+            "gpu/gpu1/coreTemp",
+            "gpu/gpu0/coreTemp",
+            "gpu/amdgpu/gpu0/temperature"
+        ]
+        
+        onTriggered: {
+            if (attemptIndex < fallbackIds.length && gpuTemp === 0) {
+                gpuTempSensor.sensorId = fallbackIds[attemptIndex]
+                attemptIndex++
+            } else {
+                running = false
+                // If no sensor found, try reading from command line
+                if (gpuTemp === 0) {
+                    gpuReadTimer.running = true;
+                }
+            }
+        }
+    }
+    
+    // GPU reading timer - try reading GPU stats from command line
+    Timer {
+        id: gpuReadTimer
+        interval: 2000
+        running: true  // Start immediately to get GPU data
+        repeat: true
+        property string cardNumber: "1"  // Default to card1, will be updated by detection
+        
+        onTriggered: {
+            // Always try to read GPU usage from sysfs
+            var gpuUsageCmd = "cat /sys/class/drm/card" + cardNumber + "/device/gpu_busy_percent 2>/dev/null || cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null";
+            processDataSource.connectSource("gpuusage|" + gpuUsageCmd);
+            
+            // Read GPU frequency - get the active frequency from pp_dpm_sclk
+            var gpuFreqCmd = "cat /sys/class/drm/card" + cardNumber + "/device/pp_dpm_sclk 2>/dev/null | grep '*' | awk '{print $2}' | sed 's/Mhz//' || cat /sys/class/drm/card1/device/pp_dpm_sclk 2>/dev/null | grep '*' | awk '{print $2}' | sed 's/Mhz//'";
+            processDataSource.connectSource("gpufreq|" + gpuFreqCmd);
+            
+            // Only read temperature if sensor failed
+            if (gpuTemp === 0) {
+                var gpuTempCmd = "sensors 2>/dev/null | grep -A2 'amdgpu' | grep 'edge:' | awk '{print $2}' | sed 's/[°C+]//g'";
+                processDataSource.connectSource("gputemp|" + gpuTempCmd);
             }
         }
     }
@@ -597,6 +779,15 @@ PlasmoidItem {
     Component.onCompleted: {
         // Get CPU core count
         processDataSource.connectSource("cpucount|nproc");
+        
+        // Detect GPU sensors
+        detectGPUSensors();
+    }
+    
+    // Function to detect available GPU sensors
+    function detectGPUSensors() {
+        // Try to read GPU usage directly from sysfs
+        processDataSource.connectSource("gpudetect|ls /sys/class/drm/card*/device/gpu_busy_percent 2>/dev/null | head -1");
     }
     
     // Timer to get TOP process information
@@ -687,6 +878,52 @@ PlasmoidItem {
                 } else {
                     root.debugInfo += "\nNo output!";
                 }
+            } else if (sourceName.indexOf("gpuusage") !== -1) {
+                var output = data["stdout"].trim();
+                if (output) {
+                    var usage = parseFloat(output);
+                    if (!isNaN(usage) && usage >= 0 && usage <= 100) {
+                        root.gpuUsage = usage;
+                        root.gpuUsageText = "GPU: " + Math.round(usage) + "%";
+                        // Stop fallback attempts
+                        gpuUsageFallbackTimer.running = false;
+                    }
+                }
+            } else if (sourceName.indexOf("gpufreq") !== -1) {
+                var output = data["stdout"].trim();
+                if (output) {
+                    var freq = parseFloat(output);
+                    if (!isNaN(freq) && freq > 0) {
+                        root.gpuFrequency = freq;
+                        // Convert MHz to GHz
+                        root.gpuFreqText = (freq / 1000).toFixed(2) + " GHz";
+                        // Stop fallback attempts
+                        gpuFreqFallbackTimer.running = false;
+                    }
+                }
+            } else if (sourceName.indexOf("gputemp") !== -1) {
+                var output = data["stdout"].trim();
+                if (output) {
+                    var temp = parseFloat(output);
+                    if (!isNaN(temp) && temp > 0 && temp < 150) {
+                        root.gpuTemp = temp;
+                        root.gpuTempText = Math.round(temp) + "°C";
+                        // Stop fallback attempts
+                        gpuTempFallbackTimer.running = false;
+                    }
+                }
+            } else if (sourceName.indexOf("gpudetect") !== -1) {
+                var output = data["stdout"].trim();
+                if (output) {
+                    console.log("GPU device found at: " + output);
+                    // Extract card number from path
+                    var cardMatch = output.match(/card(\d+)/);
+                    if (cardMatch) {
+                        var cardNum = cardMatch[1];
+                        // Update the GPU usage command to use the detected card
+                        gpuReadTimer.cardNumber = cardNum;
+                    }
+                }
             }
             disconnectSource(sourceName);
         }
@@ -720,10 +957,10 @@ PlasmoidItem {
     // Compact representation (panel icon)
     compactRepresentation: Item {
         // Automatically adjust layout based on panel orientation
-        Layout.minimumWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 24 : 180
-        Layout.minimumHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 200 : 36
-        Layout.preferredWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 48 : 240
-        Layout.preferredHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 240 : 36
+        Layout.minimumWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 24 : 280
+        Layout.minimumHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 250 : 36
+        Layout.preferredWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 48 : 320
+        Layout.preferredHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 300 : 36
         
         // Choose layout based on panel orientation
         Loader {
@@ -742,7 +979,7 @@ PlasmoidItem {
                 // CPU usage and frequency
                 Item {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 70
+                    Layout.preferredWidth: 60
                     
                     Rectangle {
                         anchors.fill: parent
@@ -759,7 +996,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: i18n("CPU") + " " + Math.round(cpuUsage) + "%"
                                 color: Kirigami.Theme.textColor
-                                font.pixelSize: 11
+                                font.pixelSize: 10
                                 font.bold: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -767,7 +1004,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: (cpuFrequency / 1000).toFixed(1) + "GHz"
                                 color: Kirigami.Theme.textColor
-                                font.pixelSize: 11
+                                font.pixelSize: 9
                                 font.bold: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -778,7 +1015,7 @@ PlasmoidItem {
                 // CPU power and temperature - PWR column
                 Item {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 65
+                    Layout.preferredWidth: 55
                     
                     Rectangle {
                         anchors.fill: parent
@@ -795,7 +1032,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: cpuPower > 0 ? cpuPower.toFixed(1) + "W" : "--W"
                                 color: Kirigami.Theme.textColor
-                                font.pixelSize: 10
+                                font.pixelSize: 9
                                 font.bold: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -803,7 +1040,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: cpuTempText
                                 color: cpuTemp > 80 ? "#F44336" : cpuTemp > 60 ? "#FF9800" : Kirigami.Theme.textColor
-                                font.pixelSize: 9
+                                font.pixelSize: 8
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
@@ -825,7 +1062,7 @@ PlasmoidItem {
                 // Memory
                 Item {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 45
+                    Layout.preferredWidth: 40
                     
                     Rectangle {
                         anchors.fill: parent
@@ -839,8 +1076,62 @@ PlasmoidItem {
                             anchors.centerIn: parent
                             text: i18n("M") + " " + Math.round(memoryUsage) + "%"
                             color: Kirigami.Theme.textColor
-                            font.pixelSize: 10
+                            font.pixelSize: 9
                             font.bold: true
+                        }
+                    }
+                }
+                
+                // GPU
+                Item {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 60
+                    
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Qt.rgba(gpuUsage > 80 ? 0.96 : gpuUsage > 50 ? 1.0 : 0.50, 
+                                       gpuUsage > 80 ? 0.26 : gpuUsage > 50 ? 0.50 : 0.20, 
+                                       gpuUsage > 80 ? 0.21 : gpuUsage > 50 ? 0.00 : 0.80, 
+                                       0.15)
+                        radius: 4
+                        
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 0
+                            
+                            PlasmaComponents3.Label {
+                                text: i18n("GPU") + " " + Math.round(gpuUsage) + "%"
+                                color: Kirigami.Theme.textColor
+                                font.pixelSize: 10
+                                font.bold: true
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            
+                            PlasmaComponents3.Label {
+                                text: gpuFrequency > 0 ? (gpuFrequency / 1000).toFixed(1) + "GHz" : "-.--GHz"
+                                color: Kirigami.Theme.textColor
+                                font.pixelSize: 9
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            
+                            PlasmaComponents3.Label {
+                                text: gpuTempText
+                                color: gpuTemp > 80 ? "#F44336" : gpuTemp > 60 ? "#FF9800" : Kirigami.Theme.textColor
+                                font.pixelSize: 9
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            
+                            PlasmaComponents3.ToolTip {
+                                visible: parent.containsMouse
+                                text: i18n("GPU") + ": " + Math.round(gpuUsage) + "%\n" +
+                                      "Freq: " + gpuFreqText + " (0.80-2.70GHz)\n" +
+                                      "Temp: " + gpuTempText
+                            }
                         }
                     }
                 }
@@ -849,7 +1140,7 @@ PlasmoidItem {
                 Item {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 70
+                    Layout.minimumWidth: 55
                     
                     Rectangle {
                         anchors.fill: parent
@@ -1015,6 +1306,54 @@ PlasmoidItem {
                             font.pixelSize: 9
                             font.bold: true
                             horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                }
+                
+                // GPU row
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "transparent"
+                    border.color: Kirigami.Theme.textColor
+                    border.width: 1
+                    radius: 2
+                    
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 1
+                        width: parent.width * (gpuUsage / 100)
+                        color: gpuUsage < 50 ? "#8B33FF" : gpuUsage < 80 ? "#FF6B35" : "#F44336"
+                        radius: 1
+                    }
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        spacing: 4
+                        
+                        PlasmaComponents3.Label {
+                            text: i18n("GPU")
+                            color: Kirigami.Theme.textColor
+                            font.pixelSize: 9
+                        }
+                        
+                        PlasmaComponents3.Label {
+                            Layout.fillWidth: true
+                            text: Math.round(gpuUsage) + "%"
+                            color: Kirigami.Theme.textColor
+                            font.pixelSize: 9
+                            font.bold: true
+                            horizontalAlignment: Text.AlignCenter
+                        }
+                        
+                        PlasmaComponents3.Label {
+                            text: gpuFrequency > 0 ? (gpuFrequency / 1000).toFixed(1) + "GHz" : "--"
+                            color: Kirigami.Theme.textColor
+                            font.pixelSize: 8
+                            opacity: 0.8
                         }
                     }
                 }
@@ -1233,6 +1572,71 @@ PlasmoidItem {
                     PlasmaComponents3.Label {
                         text: memoryDetailText
                         color: Kirigami.Theme.textColor
+                        font.pixelSize: 11
+                        opacity: 0.9
+                    }
+                }
+            }
+            
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 10
+            }
+            
+            // GPU usage section
+            PlasmaComponents3.Label {
+                text: i18n("GPU Status")
+                color: Kirigami.Theme.textColor
+                font.pixelSize: 12
+                opacity: 0.8
+            }
+            
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 32
+                color: Qt.rgba(0.55, 0.20, 1.00, 0.12) // Purple-ish color with opacity
+                radius: 4
+                
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 2
+                    width: parent.width * (gpuUsage / 100)
+                    color: gpuUsage < 50 ? "#8B33FF" : gpuUsage < 80 ? "#FF6B35" : "#F44336"
+                    radius: 2
+                }
+                
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    
+                    PlasmaComponents3.Label {
+                        Layout.fillWidth: true
+                        text: Math.round(gpuUsage) + "%"
+                        color: Kirigami.Theme.textColor
+                        font.pixelSize: 14
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    
+                    PlasmaComponents3.Label {
+                        text: gpuFrequency > 0 ? (gpuFrequency / 1000).toFixed(2) + " GHz" : "-- GHz"
+                        color: Kirigami.Theme.textColor
+                        font.pixelSize: 11
+                        opacity: 0.9
+                    }
+                    
+                    PlasmaComponents3.Label {
+                        text: "•"
+                        color: Kirigami.Theme.textColor
+                        font.pixelSize: 11
+                        opacity: 0.5
+                    }
+                    
+                    PlasmaComponents3.Label {
+                        text: gpuTempText
+                        color: gpuTemp > 80 ? "#F44336" : gpuTemp > 60 ? "#FF9800" : Kirigami.Theme.textColor
                         font.pixelSize: 11
                         opacity: 0.9
                     }
