@@ -1139,7 +1139,7 @@ PlasmoidItem {
                 // Network
                 Item {
                     Layout.fillHeight: true
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: 80
                     Layout.minimumWidth: 55
                     
                     Rectangle {
