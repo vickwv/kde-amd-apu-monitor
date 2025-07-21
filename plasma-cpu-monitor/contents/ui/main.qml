@@ -1061,8 +1061,9 @@ PlasmoidItem {
         // Input value is bytes/s
         var bytesPerSecond = speedValue || 0;
         
+        // Always show at least KB/s
         if (bytesPerSecond < 1024) {
-            return Math.round(bytesPerSecond) + " B/s";
+            return "0.0 KB/s";
         } else if (bytesPerSecond < 1024 * 1024) {
             return (bytesPerSecond / 1024).toFixed(1) + " KB/s";
         } else if (bytesPerSecond < 1024 * 1024 * 1024) {
@@ -1076,8 +1077,9 @@ PlasmoidItem {
     function formatCompactNetworkSpeed(speedValue) {
         var bytesPerSecond = speedValue || 0;
         
+        // Always show at least K (KB/s)
         if (bytesPerSecond < 1024) {
-            return bytesPerSecond > 0 ? Math.round(bytesPerSecond) + "B" : "0";
+            return "0K";
         } else if (bytesPerSecond < 1024 * 1024) {
             return (bytesPerSecond / 1024).toFixed(0) + "K";
         } else if (bytesPerSecond < 1024 * 1024 * 1024) {
@@ -1358,7 +1360,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: "↓"
                                 color: fluentColors.success
-                                font.pixelSize: 9
+                                font.pixelSize: 10
                                 font.weight: Font.Bold
                                 anchors.right: parent.right
                             }
@@ -1366,7 +1368,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: "↑"
                                 color: fluentColors.warning
-                                font.pixelSize: 9
+                                font.pixelSize: 10
                                 font.weight: Font.Bold
                                 anchors.right: parent.right
                             }
@@ -1382,7 +1384,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: formatCompactNetworkSpeed(downloadSpeed)
                                 color: fluentColors.success
-                                font.pixelSize: 8
+                                font.pixelSize: 10
                                 font.weight: Font.Medium
                                 horizontalAlignment: Text.AlignHCenter
                                 width: parent.width
@@ -1391,7 +1393,7 @@ PlasmoidItem {
                             PlasmaComponents3.Label {
                                 text: formatCompactNetworkSpeed(uploadSpeed)
                                 color: fluentColors.warning
-                                font.pixelSize: 8
+                                font.pixelSize: 10
                                 font.weight: Font.Medium
                                 horizontalAlignment: Text.AlignHCenter
                                 width: parent.width
@@ -1603,7 +1605,7 @@ PlasmoidItem {
                             width: parent.width
                             text: downloadText
                             color: colorScheme.download
-                            font.pixelSize: 8
+                            font.pixelSize: 10
                             font.bold: true
                             horizontalAlignment: Text.AlignCenter
                             elide: Text.ElideRight
@@ -1613,7 +1615,7 @@ PlasmoidItem {
                             width: parent.width
                             text: uploadText
                             color: colorScheme.upload
-                            font.pixelSize: 8
+                            font.pixelSize: 10
                             font.bold: true
                             horizontalAlignment: Text.AlignCenter
                             elide: Text.ElideRight
