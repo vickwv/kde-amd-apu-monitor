@@ -175,6 +175,124 @@ PlasmoidItem {
         };
     }
     
+    // Microsoft Fluent Design System - Complete color scheme
+    property var fluentColors: {
+        // Primary Fluent brand colors
+        "primary": "#0078D4",              // Fluent primary blue
+        "primary_light": "#40E0FF",        // Light blue
+        "primary_dark": "#005A9E",         // Dark blue
+        
+        // Fluent semantic colors
+        "success": "#107C10",              // Communication green
+        "warning": "#FF8C00",              // Shared orange  
+        "error": "#D13438",                // Communication red
+        "info": "#0078D4",                 // Communication blue
+        
+        // Fluent neutral palette 
+        "gray10": "#FAF9F8",               // Neutral gray 10
+        "gray20": "#F3F2F1",               // Neutral gray 20
+        "gray30": "#EDEBE9",               // Neutral gray 30
+        "gray40": "#E1DFDD",               // Neutral gray 40
+        "gray50": "#D2D0CE",               // Neutral gray 50
+        "gray60": "#C8C6C4",               // Neutral gray 60
+        "gray70": "#A19F9D",               // Neutral gray 70
+        "gray80": "#605E5C",               // Neutral gray 80
+        "gray90": "#323130",               // Neutral gray 90
+        "gray100": "#201F1E",              // Neutral gray 100
+        
+        // Fluent Acrylic backgrounds (强烈的毛玻璃效果)
+        "acrylic_cpu": "linear-gradient(135deg, rgba(16, 124, 16, 0.3) 0%, rgba(16, 124, 16, 0.1) 100%)",
+        "acrylic_memory": "linear-gradient(135deg, rgba(0, 120, 212, 0.3) 0%, rgba(0, 120, 212, 0.1) 100%)", 
+        "acrylic_gpu": "linear-gradient(135deg, rgba(135, 100, 184, 0.3) 0%, rgba(135, 100, 184, 0.1) 100%)",
+        "acrylic_power": "linear-gradient(135deg, rgba(255, 140, 0, 0.3) 0%, rgba(255, 140, 0, 0.1) 100%)",
+        "acrylic_network": "linear-gradient(135deg, rgba(0, 120, 212, 0.2) 0%, rgba(106, 90, 205, 0.1) 100%)",
+        
+        // Fluent reveal effects
+        "reveal_hover": Qt.rgba(1, 1, 1, 0.1),      // White reveal on hover
+        "reveal_press": Qt.rgba(1, 1, 1, 0.05),     // White reveal on press
+        
+        // Fluent elevation shadows
+        "shadow_2": Qt.rgba(0, 0, 0, 0.12),         // 2dp elevation
+        "shadow_4": Qt.rgba(0, 0, 0, 0.16),         // 4dp elevation
+        "shadow_8": Qt.rgba(0, 0, 0, 0.2),          // 8dp elevation
+    }
+    
+    // Fluent Design helper functions
+    function getFluentRadius(size) {
+        // Fluent corner radius scale
+        if (size <= 32) return 4;
+        if (size <= 48) return 6; 
+        return 8;
+    }
+    
+    function createFluentAcrylic(gradientString) {
+        // Create proper gradient background
+        return gradientString;
+    }
+    
+    // Helper function to get status color based on percentage (Fluent)
+    function getFluentStatusColor(value, warningThreshold, dangerThreshold) {
+        if (value >= dangerThreshold) return fluentColors.error;
+        if (value >= warningThreshold) return fluentColors.warning;
+        return fluentColors.success;
+    }
+    
+    // Helper function to get temperature color (Fluent style)
+    function getFluentTempColor(temp) {
+        if (temp > 80) return fluentColors.error;
+        if (temp > 65) return fluentColors.warning;
+        return fluentColors.success;
+    }
+    
+    // Helper function to create Fluent-style gradient
+    function createFluentGradient(parent, startColor, endColor) {
+        return Qt.createQmlObject('
+            import QtQuick 2.0
+            LinearGradient {
+                anchors.fill: parent
+                start: Qt.point(0, 0)
+                end: Qt.point(parent.width, parent.height)
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "' + startColor + '" }
+                    GradientStop { position: 1.0; color: "' + endColor + '" }
+                }
+            }', parent);
+    }
+    
+    // Color scheme for expanded view
+    property var colorScheme: {
+        "bg_cpu": Qt.rgba(0.06, 0.49, 0.06, 0.15),        // 绿色半透明
+        "bg_memory": Qt.rgba(0.0, 0.47, 0.83, 0.15),      // 蓝色半透明
+        "bg_gpu": Qt.rgba(0.53, 0.39, 0.72, 0.15),        // 紫色半透明
+        "bg_power": Qt.rgba(1.0, 0.55, 0.0, 0.15),        // 橙色半透明
+        "bg_network": Qt.rgba(0.0, 0.47, 0.83, 0.12),     // 蓝色半透明
+        "bg_process": Qt.rgba(0.2, 0.2, 0.2, 0.15),       // 灰色半透明
+        "bg_system": Qt.rgba(0.15, 0.15, 0.15, 0.15),     // 深灰色半透明
+        "success": fluentColors.success,
+        "warning": fluentColors.warning,
+        "danger": fluentColors.error,
+        "info": fluentColors.info,
+        "download": fluentColors.success,
+        "upload": fluentColors.warning,
+        "gpu_normal": fluentColors.success,
+        "gpu_warning": fluentColors.warning,
+        "gpu_danger": fluentColors.error
+    }
+    
+    // Helper function to get status color based on percentage
+    function getStatusColor(value, warningThreshold, dangerThreshold) {
+        if (value >= dangerThreshold) return colorScheme.danger;
+        if (value >= warningThreshold) return colorScheme.warning;
+        return colorScheme.success;
+    }
+    
+    // Helper function to get temperature color
+    function getTempColor(temp) {
+        if (temp > 80) return colorScheme.danger;
+        if (temp > 65) return colorScheme.warning;
+        return colorScheme.success;
+    }
+
     // Plasmoid properties
     Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground
     Plasmoid.title: i18n("System Resource Monitor")
@@ -954,13 +1072,29 @@ PlasmoidItem {
         }
     }
     
+    // Compact network speed format for panel display
+    function formatCompactNetworkSpeed(speedValue) {
+        var bytesPerSecond = speedValue || 0;
+        
+        if (bytesPerSecond < 1024) {
+            return bytesPerSecond > 0 ? Math.round(bytesPerSecond) + "B" : "0";
+        } else if (bytesPerSecond < 1024 * 1024) {
+            return (bytesPerSecond / 1024).toFixed(0) + "K";
+        } else if (bytesPerSecond < 1024 * 1024 * 1024) {
+            var mbps = bytesPerSecond / (1024 * 1024);
+            return mbps < 10 ? mbps.toFixed(1) + "M" : Math.round(mbps) + "M";
+        } else {
+            return (bytesPerSecond / (1024 * 1024 * 1024)).toFixed(1) + "G";
+        }
+    }
+    
     // Compact representation (panel icon)
     compactRepresentation: Item {
-        // Automatically adjust layout based on panel orientation
-        Layout.minimumWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 24 : 280
-        Layout.minimumHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 250 : 36
-        Layout.preferredWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 48 : 320
-        Layout.preferredHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 300 : 36
+        // 超紧凑布局
+        Layout.minimumWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 30 : 230
+        Layout.minimumHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 280 : 36
+        Layout.preferredWidth: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 48 : 250
+        Layout.preferredHeight: (plasmoid.formFactor === PlasmaCore.Types.Vertical) ? 320 : 36
         
         // Choose layout based on panel orientation
         Loader {
@@ -973,198 +1107,294 @@ PlasmoidItem {
             id: horizontalLayout
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: 1
-                spacing: 2
+                anchors.margins: 0
+                spacing: -2  // 更紧凑的负间距
                 
-                // CPU usage and frequency
-                Item {
+                // CPU card - 超紧凑
+                Rectangle {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 60
+                    Layout.preferredWidth: 42
+                    Layout.minimumWidth: 38
                     
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Qt.rgba(cpuUsage > 80 ? 0.96 : cpuUsage > 50 ? 1.0 : 0.26, 
-                                       cpuUsage > 80 ? 0.26 : cpuUsage > 50 ? 0.76 : 0.83, 
-                                       cpuUsage > 80 ? 0.21 : cpuUsage > 50 ? 0.22 : 0.24, 
-                                       0.15)
-                        radius: 4
-                        
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 0
-                            
-                            PlasmaComponents3.Label {
-                                text: i18n("CPU") + " " + Math.round(cpuUsage) + "%"
-                                color: Kirigami.Theme.textColor
-                                font.pixelSize: 10
-                                font.bold: true
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            
-                            PlasmaComponents3.Label {
-                                text: (cpuFrequency / 1000).toFixed(1) + "GHz"
-                                color: Kirigami.Theme.textColor
-                                font.pixelSize: 9
-                                font.bold: true
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(0.06, 0.49, 0.06, 0.25) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0.06, 0.49, 0.06, 0.1) }
                     }
-                }
-                
-                // CPU power and temperature - PWR column
-                Item {
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 55
+                    radius: getFluentRadius(height)
+                    border.width: 1
+                    border.color: fluentColors.gray40
                     
-                    Rectangle {
+                    // Fluent reveal effect on hover
+                    MouseArea {
                         anchors.fill: parent
-                        color: Qt.rgba(cpuPower > 45 ? 0.96 : cpuPower > 25 ? 1.0 : 0.13, 
-                                       cpuPower > 45 ? 0.26 : cpuPower > 25 ? 0.60 : 0.80, 
-                                       cpuPower > 45 ? 0.21 : cpuPower > 25 ? 0.00 : 0.40, 
-                                       0.15)
-                        radius: 4
+                        hoverEnabled: true
                         
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 0
-                            
-                            PlasmaComponents3.Label {
-                                text: cpuPower > 0 ? cpuPower.toFixed(1) + "W" : "--W"
-                                color: Kirigami.Theme.textColor
-                                font.pixelSize: 9
-                                font.bold: true
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            
-                            PlasmaComponents3.Label {
-                                text: cpuTempText
-                                color: cpuTemp > 80 ? "#F44336" : cpuTemp > 60 ? "#FF9800" : Kirigami.Theme.textColor
-                                font.pixelSize: 8
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                        
-                        MouseArea {
+                        Rectangle {
                             anchors.fill: parent
-                            hoverEnabled: true
-                            
-                            PlasmaComponents3.ToolTip {
-                                visible: parent.containsMouse
-                                text: i18n("Power: %1", cpuPower > 0 ? cpuPower.toFixed(1) + " W" : i18n("Unknown")) + "\n" +
-                                      i18n("Temp: %1", cpuTempText) + "\n" + 
-                                      "TDP: 35-54W\n\n" + debugInfo
-                            }
+                            color: parent.containsMouse ? fluentColors.reveal_hover : "transparent"
+                            radius: parent.radius
                         }
                     }
-                }
-                
-                // Memory
-                Item {
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 40
                     
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Qt.rgba(memoryUsage > 80 ? 0.96 : memoryUsage > 50 ? 1.0 : 0.13, 
-                                       memoryUsage > 80 ? 0.26 : memoryUsage > 50 ? 0.60 : 0.59, 
-                                       memoryUsage > 80 ? 0.21 : memoryUsage > 50 ? 0.00 : 0.85, 
-                                       0.15)
-                        radius: 4
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: -1
                         
                         PlasmaComponents3.Label {
-                            anchors.centerIn: parent
-                            text: i18n("M") + " " + Math.round(memoryUsage) + "%"
+                            text: Math.round(cpuUsage) + "%"
                             color: Kirigami.Theme.textColor
-                            font.pixelSize: 9
-                            font.bold: true
+                            font.pixelSize: 11
+                            font.weight: Font.DemiBold
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        PlasmaComponents3.Label {
+                            text: cpuFrequency > 0 ? (cpuFrequency / 1000).toFixed(1) + "G" : "--G"
+                            color: fluentColors.success
+                            font.pixelSize: 8
+                            font.weight: Font.Medium
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                 }
                 
-                // GPU
-                Item {
+                // Power card - 超紧凑
+                Rectangle {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 60
+                    Layout.preferredWidth: 42
+                    Layout.minimumWidth: 38
                     
-                    Rectangle {
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(1.0, 0.55, 0.0, 0.25) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1.0, 0.55, 0.0, 0.1) }
+                    }
+                    radius: getFluentRadius(height)
+                    border.width: 1
+                    border.color: fluentColors.gray40
+                    
+                    MouseArea {
                         anchors.fill: parent
-                        color: Qt.rgba(gpuUsage > 80 ? 0.96 : gpuUsage > 50 ? 1.0 : 0.50, 
-                                       gpuUsage > 80 ? 0.26 : gpuUsage > 50 ? 0.50 : 0.20, 
-                                       gpuUsage > 80 ? 0.21 : gpuUsage > 50 ? 0.00 : 0.80, 
-                                       0.15)
-                        radius: 4
+                        hoverEnabled: true
                         
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 0
-                            
-                            PlasmaComponents3.Label {
-                                text: i18n("GPU") + " " + Math.round(gpuUsage) + "%"
-                                color: Kirigami.Theme.textColor
-                                font.pixelSize: 10
-                                font.bold: true
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            
-                            PlasmaComponents3.Label {
-                                text: gpuFrequency > 0 ? (gpuFrequency / 1000).toFixed(1) + "GHz" : "-.--GHz"
-                                color: Kirigami.Theme.textColor
-                                font.pixelSize: 9
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            
-                            PlasmaComponents3.Label {
-                                text: gpuTempText
-                                color: gpuTemp > 80 ? "#F44336" : gpuTemp > 60 ? "#FF9800" : Kirigami.Theme.textColor
-                                font.pixelSize: 9
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                        
-                        MouseArea {
+                        Rectangle {
                             anchors.fill: parent
-                            hoverEnabled: true
-                            
-                            PlasmaComponents3.ToolTip {
-                                visible: parent.containsMouse
-                                text: i18n("GPU") + ": " + Math.round(gpuUsage) + "%\n" +
-                                      "Freq: " + gpuFreqText + " (0.80-2.70GHz)\n" +
-                                      "Temp: " + gpuTempText
-                            }
+                            color: parent.containsMouse ? fluentColors.reveal_hover : "transparent"
+                            radius: parent.radius
+                        }
+                        
+                        PlasmaComponents3.ToolTip {
+                            visible: parent.containsMouse
+                            text: i18n("Power: %1", cpuPower > 0 ? cpuPower.toFixed(1) + " W" : i18n("Unknown")) + "\n" +
+                                  i18n("Temp: %1", cpuTempText) + "\n" + 
+                                  "TDP: 35-54W"
+                        }
+                    }
+                    
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: -1
+                        
+                        PlasmaComponents3.Label {
+                            text: cpuPower > 0 ? Math.round(cpuPower) + "W" : "--W"
+                            color: Kirigami.Theme.textColor
+                            font.pixelSize: 11
+                            font.weight: Font.DemiBold
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        PlasmaComponents3.Label {
+                            text: Math.round(cpuTemp) + "°"
+                            color: getFluentTempColor(cpuTemp)
+                            font.pixelSize: 8
+                            font.weight: Font.Medium
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
                 }
                 
-                // Network
-                Item {
+                // Memory card - 超紧凑
+                Rectangle {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 80
-                    Layout.minimumWidth: 55
+                    Layout.preferredWidth: 42
+                    Layout.minimumWidth: 38
                     
-                    Rectangle {
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(0.0, 0.47, 0.83, 0.25) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0.0, 0.47, 0.83, 0.1) }
+                    }
+                    radius: getFluentRadius(height)
+                    border.width: 1
+                    border.color: fluentColors.gray40
+                    
+                    MouseArea {
                         anchors.fill: parent
-                        color: Qt.rgba(0.40, 0.23, 0.72, 0.12)
-                        radius: 4
+                        hoverEnabled: true
                         
+                        Rectangle {
+                            anchors.fill: parent
+                            color: parent.containsMouse ? fluentColors.reveal_hover : "transparent"
+                            radius: parent.radius
+                        }
+                    }
+                    
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: -1
+                        
+                        PlasmaComponents3.Label {
+                            text: Math.round(memoryUsage) + "%"
+                            color: Kirigami.Theme.textColor
+                            font.pixelSize: 11
+                            font.weight: Font.DemiBold
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        PlasmaComponents3.Label {
+                            text: memoryTotal > 0 ? (memoryUsed / 1024 / 1024 / 1024).toFixed(1) + "G" : "--G"
+                            color: fluentColors.info
+                            font.pixelSize: 8
+                            font.weight: Font.Medium
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                }
+                
+                // GPU card - 超紧凑
+                Rectangle {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 42
+                    Layout.minimumWidth: 38
+                    
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(0.53, 0.39, 0.72, 0.25) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0.53, 0.39, 0.72, 0.1) }
+                    }
+                    radius: getFluentRadius(height)
+                    border.width: 1
+                    border.color: fluentColors.gray40
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        
+                        Rectangle {
+                            anchors.fill: parent
+                            color: parent.containsMouse ? fluentColors.reveal_hover : "transparent"
+                            radius: parent.radius
+                        }
+                        
+                        PlasmaComponents3.ToolTip {
+                            visible: parent.containsMouse
+                            text: i18n("GPU") + ": " + Math.round(gpuUsage) + "%\n" +
+                                  "Freq: " + (gpuFrequency > 0 ? (gpuFrequency / 1000).toFixed(1) + "GHz" : "N/A") + "\n" +
+                                  "Temp: " + gpuTempText
+                        }
+                    }
+                    
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: -1
+                        
+                        PlasmaComponents3.Label {
+                            text: Math.round(gpuUsage) + "%"
+                            color: Kirigami.Theme.textColor
+                            font.pixelSize: 11
+                            font.weight: Font.DemiBold
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        PlasmaComponents3.Label {
+                            text: Math.round(gpuTemp) + "°"
+                            color: getFluentTempColor(gpuTemp)
+                            font.pixelSize: 8
+                            font.weight: Font.Medium
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                }
+                
+                // Network card - 优化布局
+                Rectangle {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 48
+                    Layout.minimumWidth: 44
+                    
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(0.0, 0.47, 0.83, 0.2) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0.42, 0.35, 0.80, 0.1) }
+                    }
+                    radius: getFluentRadius(height)
+                    border.width: 1
+                    border.color: fluentColors.gray40
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        
+                        Rectangle {
+                            anchors.fill: parent
+                            color: parent.containsMouse ? fluentColors.reveal_hover : "transparent"
+                            radius: parent.radius
+                        }
+                        
+                        PlasmaComponents3.ToolTip {
+                            visible: parent.containsMouse
+                            text: "Download: " + formatNetworkSpeed(downloadSpeed) + "\nUpload: " + formatNetworkSpeed(uploadSpeed)
+                        }
+                    }
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        spacing: 1
+                        
+                        // 左侧箭头列 - 固定宽度
                         Column {
-                            anchors.centerIn: parent
-                            spacing: 0
+                            Layout.preferredWidth: 12
+                            Layout.minimumWidth: 12
+                            Layout.alignment: Qt.AlignVCenter
+                            spacing: -1
                             
                             PlasmaComponents3.Label {
-                                text: downloadText
-                                color: "#4CAF50"
+                                text: "↓"
+                                color: fluentColors.success
                                 font.pixelSize: 9
-                                font.bold: true
-                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.weight: Font.Bold
+                                anchors.right: parent.right
                             }
                             
                             PlasmaComponents3.Label {
-                                text: uploadText
-                                color: "#FF5722"
+                                text: "↑"
+                                color: fluentColors.warning
                                 font.pixelSize: 9
-                                font.bold: true
-                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.weight: Font.Bold
+                                anchors.right: parent.right
+                            }
+                        }
+                        
+                        // 右侧数值列 - 弹性宽度
+                        Column {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 32  // 为数字变大预留空间
+                            Layout.alignment: Qt.AlignVCenter
+                            spacing: -1
+                            
+                            PlasmaComponents3.Label {
+                                text: formatCompactNetworkSpeed(downloadSpeed)
+                                color: fluentColors.success
+                                font.pixelSize: 8
+                                font.weight: Font.Medium
+                                horizontalAlignment: Text.AlignHCenter
+                                width: parent.width
+                            }
+                            
+                            PlasmaComponents3.Label {
+                                text: formatCompactNetworkSpeed(uploadSpeed)
+                                color: fluentColors.warning
+                                font.pixelSize: 8
+                                font.weight: Font.Medium
+                                horizontalAlignment: Text.AlignHCenter
+                                width: parent.width
                             }
                         }
                     }
@@ -1184,10 +1414,10 @@ PlasmoidItem {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: "transparent"
-                    border.color: Kirigami.Theme.textColor
+                    color: colorScheme.bg_cpu
+                    border.color: Qt.rgba(1, 1, 1, 0.2)
                     border.width: 1
-                    radius: 2
+                    radius: 6
                     
                     Rectangle {
                         anchors.left: parent.left
@@ -1195,7 +1425,7 @@ PlasmoidItem {
                         anchors.bottom: parent.bottom
                         anchors.margins: 1
                         width: parent.width * (cpuUsage / 100)
-                        color: cpuUsage < 50 ? "#4CAF50" : cpuUsage < 80 ? "#FFC107" : "#F44336"
+                        color: getStatusColor(cpuUsage, 50, 80)
                         radius: 1
                     }
                     
@@ -1232,18 +1462,15 @@ PlasmoidItem {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: "transparent"
-                    border.color: Kirigami.Theme.textColor
+                    color: colorScheme.bg_power
+                    border.color: Qt.rgba(1, 1, 1, 0.2)
                     border.width: 1
-                    radius: 2
+                    radius: 6
                     
                     Rectangle {
                         anchors.fill: parent
                         anchors.margins: 1
-                        color: Qt.rgba(cpuPower > 45 ? 0.96 : cpuPower > 25 ? 1.0 : 0.13, 
-                                       cpuPower > 45 ? 0.26 : cpuPower > 25 ? 0.60 : 0.80, 
-                                       cpuPower > 45 ? 0.21 : cpuPower > 25 ? 0.00 : 0.40, 
-                                       0.2)
+                        color: colorScheme.bg_power
                         radius: 1
                     }
                     
@@ -1273,10 +1500,10 @@ PlasmoidItem {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: "transparent"
-                    border.color: Kirigami.Theme.textColor
+                    color: colorScheme.bg_memory
+                    border.color: Qt.rgba(1, 1, 1, 0.2)
                     border.width: 1
-                    radius: 2
+                    radius: 6
                     
                     Rectangle {
                         anchors.left: parent.left
@@ -1284,7 +1511,7 @@ PlasmoidItem {
                         anchors.bottom: parent.bottom
                         anchors.margins: 1
                         width: parent.width * (memoryUsage / 100)
-                        color: memoryUsage < 50 ? "#2196F3" : memoryUsage < 80 ? "#FF9800" : "#F44336"
+                        color: getStatusColor(memoryUsage, 50, 80)
                         radius: 1
                     }
                     
@@ -1314,10 +1541,10 @@ PlasmoidItem {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: "transparent"
-                    border.color: Kirigami.Theme.textColor
+                    color: colorScheme.bg_gpu
+                    border.color: Qt.rgba(1, 1, 1, 0.2)
                     border.width: 1
-                    radius: 2
+                    radius: 6
                     
                     Rectangle {
                         anchors.left: parent.left
@@ -1325,7 +1552,7 @@ PlasmoidItem {
                         anchors.bottom: parent.bottom
                         anchors.margins: 1
                         width: parent.width * (gpuUsage / 100)
-                        color: gpuUsage < 50 ? "#8B33FF" : gpuUsage < 80 ? "#FF6B35" : "#F44336"
+                        color: gpuUsage < 50 ? colorScheme.gpu_normal : gpuUsage < 80 ? colorScheme.gpu_warning : colorScheme.gpu_danger
                         radius: 1
                     }
                     
@@ -1362,10 +1589,10 @@ PlasmoidItem {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: "transparent"
-                    border.color: Kirigami.Theme.textColor
+                    color: colorScheme.bg_network
+                    border.color: Qt.rgba(1, 1, 1, 0.2)
                     border.width: 1
-                    radius: 2
+                    radius: 6
                     
                     Column {
                         anchors.fill: parent
@@ -1375,7 +1602,7 @@ PlasmoidItem {
                         PlasmaComponents3.Label {
                             width: parent.width
                             text: downloadText
-                            color: "#4CAF50"
+                            color: colorScheme.download
                             font.pixelSize: 8
                             font.bold: true
                             horizontalAlignment: Text.AlignCenter
@@ -1385,7 +1612,7 @@ PlasmoidItem {
                         PlasmaComponents3.Label {
                             width: parent.width
                             text: uploadText
-                            color: "#FF5722"
+                            color: colorScheme.upload
                             font.pixelSize: 8
                             font.bold: true
                             horizontalAlignment: Text.AlignCenter
@@ -1417,7 +1644,7 @@ PlasmoidItem {
             
             ColumnLayout {
                 width: scrollView.availableWidth
-                spacing: 8
+                spacing: 4
             
             Kirigami.Heading {
                 level: 3
@@ -1427,7 +1654,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // CPU information section
@@ -1441,8 +1668,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                color: Qt.rgba(0.76, 0.90, 0.50, 0.12) // Material Design Light Green 100 with opacity
-                radius: 4
+                color: colorScheme.bg_cpu
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 Rectangle {
                     anchors.left: parent.left
@@ -1450,8 +1679,8 @@ PlasmoidItem {
                     anchors.bottom: parent.bottom
                     anchors.margins: 2
                     width: parent.width * (cpuUsage / 100)
-                    color: cpuUsage < 50 ? "#27ae60" : cpuUsage < 80 ? "#f39c12" : "#e74c3c"
-                    radius: 2
+                    color: getStatusColor(cpuUsage, 50, 80)
+                    radius: 4
                 }
                 
                 RowLayout {
@@ -1478,7 +1707,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // CPU power section
@@ -1492,8 +1721,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                color: Qt.rgba(0.90, 0.49, 0.13, 0.12)
-                radius: 4
+                color: colorScheme.bg_power
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 Rectangle {
                     anchors.left: parent.left
@@ -1501,8 +1732,8 @@ PlasmoidItem {
                     anchors.bottom: parent.bottom
                     anchors.margins: 2
                     width: parent.width * Math.min(cpuPower / 54, 1.0) // 54W is TDP limit
-                    color: cpuPower < 25 ? "#4CAF50" : cpuPower < 45 ? "#FF9800" : "#F44336"
-                    radius: 2
+                    color: cpuPower < 25 ? colorScheme.success : cpuPower < 45 ? colorScheme.warning : colorScheme.danger
+                    radius: 4
                 }
                 
                 RowLayout {
@@ -1524,12 +1755,26 @@ PlasmoidItem {
                         font.pixelSize: 11
                         opacity: 0.7
                     }
+                    
+                    PlasmaComponents3.Label {
+                        text: "•"
+                        color: Kirigami.Theme.textColor
+                        font.pixelSize: 11
+                        opacity: 0.5
+                    }
+                    
+                    PlasmaComponents3.Label {
+                        text: cpuTempText
+                        color: getTempColor(cpuTemp)
+                        font.pixelSize: 11
+                        opacity: 0.9
+                    }
                 }
             }
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // Memory usage section
@@ -1543,8 +1788,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                color: Qt.rgba(0.76, 0.90, 0.50, 0.12) // Material Design Light Green 100 with opacity
-                radius: 4
+                color: colorScheme.bg_memory
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 Rectangle {
                     anchors.left: parent.left
@@ -1552,8 +1799,8 @@ PlasmoidItem {
                     anchors.bottom: parent.bottom
                     anchors.margins: 2
                     width: parent.width * (memoryUsage / 100)
-                    color: memoryUsage < 50 ? "#3498db" : memoryUsage < 80 ? "#f39c12" : "#e74c3c"
-                    radius: 2
+                    color: getStatusColor(memoryUsage, 50, 80)
+                    radius: 4
                 }
                 
                 RowLayout {
@@ -1580,7 +1827,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // GPU usage section
@@ -1594,8 +1841,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                color: Qt.rgba(0.55, 0.20, 1.00, 0.12) // Purple-ish color with opacity
-                radius: 4
+                color: colorScheme.bg_gpu
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 Rectangle {
                     anchors.left: parent.left
@@ -1603,8 +1852,8 @@ PlasmoidItem {
                     anchors.bottom: parent.bottom
                     anchors.margins: 2
                     width: parent.width * (gpuUsage / 100)
-                    color: gpuUsage < 50 ? "#8B33FF" : gpuUsage < 80 ? "#FF6B35" : "#F44336"
-                    radius: 2
+                    color: gpuUsage < 50 ? colorScheme.gpu_normal : gpuUsage < 80 ? colorScheme.gpu_warning : colorScheme.gpu_danger
+                    radius: 4
                 }
                 
                 RowLayout {
@@ -1636,7 +1885,7 @@ PlasmoidItem {
                     
                     PlasmaComponents3.Label {
                         text: gpuTempText
-                        color: gpuTemp > 80 ? "#F44336" : gpuTemp > 60 ? "#FF9800" : Kirigami.Theme.textColor
+                        color: getTempColor(gpuTemp)
                         font.pixelSize: 11
                         opacity: 0.9
                     }
@@ -1645,7 +1894,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // Network speed section
@@ -1659,8 +1908,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
-                color: Qt.rgba(0.40, 0.23, 0.72, 0.08) // Material Design Deep Purple 50 with opacity
-                radius: 4
+                color: colorScheme.bg_network
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 RowLayout {
                     anchors.fill: parent
@@ -1670,7 +1921,7 @@ PlasmoidItem {
                     PlasmaComponents3.Label {
                         Layout.fillWidth: true
                         text: downloadText
-                        color: "#4CAF50"
+                        color: colorScheme.download
                         font.pixelSize: 12
                         font.bold: true
                         horizontalAlignment: Text.AlignCenter
@@ -1686,7 +1937,7 @@ PlasmoidItem {
                     PlasmaComponents3.Label {
                         Layout.fillWidth: true
                         text: uploadText
-                        color: "#e74c3c"
+                        color: colorScheme.upload
                         font.pixelSize: 12
                         font.bold: true
                         horizontalAlignment: Text.AlignCenter
@@ -1696,13 +1947,13 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // Process information section
@@ -1716,8 +1967,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 50
-                color: Qt.rgba(0.49, 0.34, 0.65, 0.08) // Material Design Purple 50 with opacity
-                radius: 4
+                color: colorScheme.bg_process
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 ColumnLayout {
                     anchors.fill: parent
@@ -1737,7 +1990,7 @@ PlasmoidItem {
                         PlasmaComponents3.Label {
                             Layout.fillWidth: true
                             text: topCpuProcess || "N/A"
-                            color: "#FF9800"
+                            color: colorScheme.warning
                             font.pixelSize: 11
                             font.bold: true
                             elide: Text.ElideRight
@@ -1745,7 +1998,7 @@ PlasmoidItem {
                         
                         PlasmaComponents3.Label {
                             text: topCpuUsage.toFixed(1) + "%"
-                            color: "#FF9800"
+                            color: colorScheme.warning
                             font.pixelSize: 10
                         }
                     }
@@ -1763,7 +2016,7 @@ PlasmoidItem {
                         PlasmaComponents3.Label {
                             Layout.fillWidth: true
                             text: topMemProcess || "N/A"
-                            color: "#2196F3"
+                            color: colorScheme.info
                             font.pixelSize: 11
                             font.bold: true
                             elide: Text.ElideRight
@@ -1771,7 +2024,7 @@ PlasmoidItem {
                         
                         PlasmaComponents3.Label {
                             text: topMemUsage.toFixed(1) + "%"
-                            color: "#2196F3"
+                            color: colorScheme.info
                             font.pixelSize: 10
                         }
                     }
@@ -1780,7 +2033,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
             
             // System load section
@@ -1807,8 +2060,10 @@ PlasmoidItem {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 60
-                color: Qt.rgba(0.0, 0.59, 0.53, 0.08) // Material Design Teal 50 with opacity
-                radius: 4
+                color: colorScheme.bg_system
+                radius: 8
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.1)
                 
                 ColumnLayout {
                     anchors.fill: parent
@@ -1830,8 +2085,8 @@ PlasmoidItem {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: parent.width * 0.7
                                 height: parent.height * Math.min(systemLoad1 / cpuCoreCount, 1.0)
-                                color: systemLoad1 > cpuCoreCount ? "#F44336" : systemLoad1 > cpuCoreCount * 0.7 ? "#FF9800" : "#4CAF50"
-                                radius: 2
+                                color: systemLoad1 > cpuCoreCount ? colorScheme.danger : systemLoad1 > cpuCoreCount * 0.7 ? colorScheme.warning : colorScheme.success
+                                radius: 4
                             }
                             
                             PlasmaComponents3.Label {
@@ -1853,8 +2108,8 @@ PlasmoidItem {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: parent.width * 0.7
                                 height: parent.height * Math.min(systemLoad5 / cpuCoreCount, 1.0)
-                                color: systemLoad5 > cpuCoreCount ? "#F44336" : systemLoad5 > cpuCoreCount * 0.7 ? "#FF9800" : "#4CAF50"
-                                radius: 2
+                                color: systemLoad5 > cpuCoreCount ? colorScheme.danger : systemLoad5 > cpuCoreCount * 0.7 ? colorScheme.warning : colorScheme.success
+                                radius: 4
                             }
                             
                             PlasmaComponents3.Label {
@@ -1876,8 +2131,8 @@ PlasmoidItem {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: parent.width * 0.7
                                 height: parent.height * Math.min(systemLoad15 / cpuCoreCount, 1.0)
-                                color: systemLoad15 > cpuCoreCount ? "#F44336" : systemLoad15 > cpuCoreCount * 0.7 ? "#FF9800" : "#4CAF50"
-                                radius: 2
+                                color: systemLoad15 > cpuCoreCount ? colorScheme.danger : systemLoad15 > cpuCoreCount * 0.7 ? colorScheme.warning : colorScheme.success
+                                radius: 4
                             }
                             
                             PlasmaComponents3.Label {
@@ -1926,7 +2181,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 20
+                Layout.preferredHeight: 8
             }
             
             PlasmaComponents3.Label {
@@ -1939,7 +2194,7 @@ PlasmoidItem {
             
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 10
+                Layout.preferredHeight: 4
             }
         }
     }
