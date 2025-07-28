@@ -1205,7 +1205,7 @@ PlasmoidItem {
                         }
                         
                         PlasmaComponents3.Label {
-                            text: Math.round(cpuTemp) + "°"
+                            text: cpuTemp > 0 ? Math.round(cpuTemp) + "°" : "--°"
                             color: getFluentTempColor(cpuTemp)
                             font.pixelSize: 8
                             font.weight: Font.Medium
@@ -1766,7 +1766,7 @@ PlasmoidItem {
                     }
                     
                     PlasmaComponents3.Label {
-                        text: cpuTempText
+                        text: cpuTemp > 0 ? Math.round(cpuTemp) + "°C" : "--°C"
                         color: getTempColor(cpuTemp)
                         font.pixelSize: 11
                         opacity: 0.9
